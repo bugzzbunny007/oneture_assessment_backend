@@ -34,6 +34,12 @@ const fetchDataFromAPI = async (pageNumber, size) => {
 };
 
 
+// Endpoint to fetch data with pagination
+app.get('/', async (req, res) => {
+  res.json(
+    "Welcome to Home page"
+  )
+});
 
 // Endpoint to fetch data with pagination
 app.get('/api/data', async (req, res) => {
