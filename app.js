@@ -63,8 +63,6 @@ app.get('/api/export', async (req, res) => {
   const pageNumber = req.query.pageNumber || 0;
   const pageSize = req.query.size || 15;
 
-  console.log("this is page number exprt",req.query.pageNumber);
-
   try {
     console.log("Fetching data from API...");
     const response = await fetchDataFromAPI(pageNumber, pageSize);
@@ -91,16 +89,15 @@ app.get('/api/export', async (req, res) => {
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     
     console.log("Writing Excel file...");
-    // Write Excel file to disk
-    XLSX.writeFile(wb, 'output.xlsx');
+    // Generate Excel file in memory
+    const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 
-    console.log("Excel file written successfully");
+    console.log("Excel file generated successfully");
     
     // Send the Excel file as response
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename="data.xlsx"');
-    const stream = XLSX.stream.to_csv(ws);
-    stream.pipe(res);
+    res.send(excelBuffer);
 
     console.log("Response sent successfully");
   } catch (error) {
@@ -108,6 +105,7 @@ app.get('/api/export', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
